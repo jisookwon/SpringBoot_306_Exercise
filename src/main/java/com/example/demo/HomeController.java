@@ -21,105 +21,61 @@ public class HomeController {
     @Autowired
     SongRepository songRepository;
 
+
+    //=======Song======================================================================
     @RequestMapping("/")
-    public String index(Model model) {
-        //First let's create a Albun
-        Album album = new Album();
-        album.setName("Beatles");
-        album.setGenre("Ballard");
-
-        //Now let's create a song
-        Song song = new Song();
-        song.setTitle("Yesterday");
-        song.setYear(1962);
-        song.setDescription("about memory....");
-
-        //Add the song to an empty list
-        Set<Song> songs = new HashSet<Song>();
-        songs.add(song);
-
-        song = new Song();
-        song.setTitle("Yello submarine");
-        song.setYear(2011);
-        song.setDescription("lovely song");
-        songs.add(song);
-
-        //Add the list of songs to the Album's song list
-        album.setSongs(songs);
-
-        //Save the director to the database
-        albumRepository.save(album);
-
-        //Grad all the directors from the database and send them to the plate
-        model.addAttribute("albums", albumRepository.findAll());
-        return "index";
-    }
-
-
-    //=======Album======================================================================
-        @RequestMapping("/")
-        public String listAlbums(Model model){
-            model.addAttribute("albums", albumRepository.findAll());
-            return "list";
-        }
-
-        @GetMapping("/addAlbum")
-        public String albumForm(Model model){
-            model.addAttribute("songs", songRepository.findAll());
-            model.addAttribute("album", new Album());
-            return "albumForm";
-        }
-
-        @PostMapping("/processAlbum")
-        public String processForm(@Valid Album album, BindingResult result, Model model){
-            model.addAttribute("album", album);
-
-            if (result.hasErrors()){
-                model.addAttribute("songs", songRepository.findAll());
-                return "albumForm";
-            }
-            albumRepository.save(album);
-            return "redirect:/";
-        }
-
-        @RequestMapping("/detail/{id}")
-        public String showAlbums(@PathVariable("id") long id, Model model){
-            model.addAttribute("album", albumRepository.findById(id).get());
-            return "show";
-        }
-
-        @RequestMapping("/update/{id}")
-        public String updateAlbums(@PathVariable("id") long id, Model model){
-            model.addAttribute("songs", songRepository.findAll());
-            model.addAttribute("album", albumRepository.findById(id).get());
-            return "albumForm";
-        }
-
-        @RequestMapping("/delete/{id}")
-        public String delAlbums(@PathVariable("id") long id){
-            albumRepository.deleteById(id);
-            return "redirect:/";
-        }
-    //====Song===============================================================
-    @RequestMapping("/")
-    public String (Model model){
+    public String listSongs(Model model){
         model.addAttribute("songs", songRepository.findAll());
+        model.addAttribute("albums", albumRepository.findAll());
         return "list";
     }
 
-    @GetMapping("/addSongs")
-    public String songForm(Model model){
+    @GetMapping("/add")
+    public String courseForm(Model model){
         model.addAttribute("albums", albumRepository.findAll());
         model.addAttribute("song", new Song());
         return "songForm";
     }
 
-    @PostMapping("/processSongs")
-    public String processForm(@Valid Album album, BindingResult result, Model model){
-        model.addAttribute("song", song);
-
-        if (result.hasErrors()){
+    @PostMapping("/process")
+    public String processForm(@Valid Song song, BindingResult result, Model model){
+        if(result.hasErrors()){
+            model.addAttribute("albums", albumRepository.findAll());
             return "songForm";
+        }
+        songRepository.save(song);
+        return "redirect:/";
+    }
+
+    @RequestMapping("/detail/{id}")
+    public String showSong(@PathVariable("id") long id, Model model){
+        model.addAttribute("song", songRepository.findById(id).get());
+        return "show";
+    }
+
+    @RequestMapping("/update/{id}")
+    public String updateSong(@PathVariable("id") long id, Model model){
+        model.addAttribute("albums", albumRepository.findAll());
+        model.addAttribute("song", songRepository.findById(id));
+        return "songForm";
+    }
+
+    @RequestMapping("/delete/{id}")
+    public String delSong(@PathVariable("id") long id){
+        songRepository.deleteById(id);
+        return "redirect:/";
+    }
+
+    //========================= album======================
+    @GetMapping("/addAlbum")
+    public String albumForm(Model model){
+        model.addAttribute("album", new Album());
+        return "albumForm";
+    }
+    @PostMapping("/processAlbum")
+    public String processAlbum(@Valid Album album, BindingResult result){
+        if(result.hasErrors()){
+            return "albumForm";
         }
         albumRepository.save(album);
         return "redirect:/";

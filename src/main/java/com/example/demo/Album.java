@@ -1,17 +1,28 @@
 package com.example.demo;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Set;
 
 @Entity
 public class Album {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+
+    @NotNull
+    @Size(min=4)
     private String name;
+
+    @NotNull
+    @Size(min=4)
     private String genre;
 
-    @OneToMany(mappedBy = "album", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "album",
+            fetch = FetchType.EAGER,
+            orphanRemoval = true)
     public Set<Song> songs;
 
     public long getId() {
